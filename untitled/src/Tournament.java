@@ -106,16 +106,13 @@ public class Tournament implements Matchmaking {
 
     @Override
     public void generateTournament() {
-       for(int i = 0; i < this.teamsCount; i++){
-           for(int j = 0; j < this.teamsCount; j++){
-               match(this.teams.get(i), this.teams.get(j));
+        // každý tým bude hrát proti týmu před a za
+       for (int i = 0; i < this.getTeamsCount(); i++){
+           int num = i + 1;
+           if (i == this.getTeamsCount() - 1){
+               num = 0;
            }
-       }
-       for (int i = this.teamsCount; i > 0; i--){
-           int num = i - 1;
-           for (int j = this.teamsCount; j > 0; j--){
-               match(this.teams.get(num), this.teams.get(j-1));
-           }
+           match(this.teams.get(i), this.teams.get(num));
        }
     }
     public ArrayList<String> displayEventsLeft(Team team){
