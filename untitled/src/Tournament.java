@@ -2,8 +2,8 @@ import java.util.ArrayList;
 public class Tournament implements Matchmaking {
     private final int teamsCount;
     private final int eventsCount;
-    private ArrayList<Team> teams;
-    private ArrayList<String> events;
+    private final ArrayList<Team> teams;
+    private final ArrayList<String> events;
 
     public Tournament(int teamsCount, int eventsCount) {
         this.teamsCount = teamsCount;
@@ -34,7 +34,7 @@ public class Tournament implements Matchmaking {
     public ArrayList<Team> createTeams(){
         ArrayList<Team> teams = new ArrayList<Team>();
         for (int i = 0; i < this.teamsCount; i++){
-            Team team = new Team("Team"+(i+1), createEvents(), (teamsCount/2), (teamsCount/2));
+            Team team = new Team("Team"+(i+1), createEvents(), (this.teamsCount/2), (this.teamsCount/2));
             teams.add(team);
         }
         return teams;
@@ -48,23 +48,20 @@ public class Tournament implements Matchmaking {
         return events;
     }
 
-    private boolean playedEachOther(Team home, Team away){
-        if(home.getPlayedAgainst().contains(away.getName()) || away.getPlayedAgainst().contains(home.getName())){
-            return true;
-        }
-        return false;
+    private boolean playedEachOther(Team home, Team away) {
+       return home.getPlayedAgainst().contains(away.getName()) || away.getPlayedAgainst().contains(home.getName());
     }
 
     @Override
     public boolean match(Team home, Team away){
         // Check jestli nehraje proti sam sobě
         if(home.getName() == away.getName()){
-            // System.out.println("Tým nemůže hrát sám se sebou");
+            System.out.println("Tým nemůže hrát sám se sebou");
             return false;
         }
         // check jestli se již nepotkaly
         if(playedEachOther(home, away)){
-            // System.out.println("Tým " + home.getName() + " již hrál proti týmu " + away.getName());
+            System.out.println("Tým " + home.getName() + " již hrál proti týmu " + away.getName());
             return false;
         }
 
@@ -94,27 +91,41 @@ public class Tournament implements Matchmaking {
                     away.setNoonSlots(away.getNoonSlots() - 1);
                     return true;
                 } else {
-                    // System.out.println("Nebyl nalezen společný časový slot");
+                    System.out.println("Nebyl nalezen společný časový slot");
                     return false;
                 }
 
             }
         }
-        // System.out.println("Tyto týmy nemají možnost hrát disciplínu, který ani jeden nehrál");
+        System.out.println("Tyto týmy nemají možnost hrát disciplínu, který ani jeden nehrál");
         return false;
     }
 
     @Override
     public void generateTournament() {
-        // každý tým bude hrát proti týmu před a za
-       for (int i = 0; i < this.getTeamsCount(); i++){
-           int num = i + 1;
-           if (i == this.getTeamsCount() - 1){
-               num = 0;
-           }
-           match(this.teams.get(i), this.teams.get(num));
-       }
+        // hledání zápasů od prvního týmu dál
+        for (int i = 0; i < this.getTeamsCount(); i++){
+            int num = i;
+            for (int j = 0; j < this.getTeamsCount(); j++){
+                if(num == j){
+                    continue;
+                }
+                this.match(this.getTeams().get(num), this.getTeams().get(j));
+            }
+        }
+        //Check od posledního dopředu
+        for (int i = this.teamsCount; i > 0; i--){
+            int num = i - 1;
+            for (int j = this.teamsCount; j > 0; j--){
+                if (num == j){
+                    continue;
+                }
+                this.match(this.getTeams().get(num), this.getTeams().get(j-1));
+            }
+        }
     }
+
+    //Zobrazí disciplíny, které tým ještě nehrál. Argument musí obsahovat konkrétní tým
     public ArrayList<String> displayEventsLeft(Team team){
         return team.getEvents();
     }
@@ -122,11 +133,9 @@ public class Tournament implements Matchmaking {
     public void displayAllLeft(){
         for(int i = 0; i < this.teamsCount; i++){
             Team currentTeam = teams.get(i);
-            System.out.println("Tým " + currentTeam.getName() + " již hrál proti: " + currentTeam.getPlayedAgainst());
-            System.out.println("Týmu " + currentTeam.getName() + " zbývají disciplíny: " + currentTeam.getEvents() + "\n ");
+            System.out.println(currentTeam.getName() + ":" + "\nSoupeři: " + currentTeam.getPlayedAgainst() + "\n" +
+                    "Zbývají disciplíny: " + currentTeam.getEvents() + "\n" +
+                    "Zbývající časové sloty ráno: " + currentTeam.getMorningSlots() + "\nOdopoledne: " + currentTeam.getNoonSlots() + "\n");
         }
     }
 }
-
-
-
