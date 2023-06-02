@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Objects;
+
 public class Tournament implements Matchmaking {
     private final int teamsCount;
     private final int eventsCount;
@@ -55,7 +57,7 @@ public class Tournament implements Matchmaking {
     @Override
     public boolean match(Team home, Team away){
         // Check jestli nehraje proti sam sobě
-        if(home.getName() == away.getName()){
+        if(Objects.equals(home.getName(), away.getName())){
             System.out.println("Tým nemůže hrát sám se sebou");
             return false;
         }
@@ -133,9 +135,13 @@ public class Tournament implements Matchmaking {
     public void displayAllLeft(){
         for(int i = 0; i < this.teamsCount; i++){
             Team currentTeam = teams.get(i);
+            System.out.println("************************************************************************************");
             System.out.println(currentTeam.getName() + ":" + "\nSoupeři: " + currentTeam.getPlayedAgainst() + "\n" +
                     "Zbývají disciplíny: " + currentTeam.getEvents() + "\n" +
                     "Zbývající časové sloty ráno: " + currentTeam.getMorningSlots() + "\nOdopoledne: " + currentTeam.getNoonSlots() + "\n");
         }
     }
 }
+
+
+
